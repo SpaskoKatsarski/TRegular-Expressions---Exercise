@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace T02._Race
@@ -16,43 +17,47 @@ namespace T02._Race
 
             Dictionary<string, int> competitorsAndTheirDistance = new Dictionary<string, int>();
 
-            foreach (string name in validNames)
+            foreach (var name in validNames)
             {
                 competitorsAndTheirDistance.Add(name, 0);
             }
-
-            string input = Console.ReadLine();
-
-            while (input != "end of race")
+            
+            string input;
+            while ((input = Console.ReadLine()) != "end of race")
             {
-                Match currMatch = Regex.Match(input, pattern);
+                StringBuilder currName = new StringBuilder();
+                int distance = 0;
 
-                if (currMatch.Success)
+                foreach (char ch in input)
                 {
-                    string name = currMatch.Groups["name"].Value;
-                    int distance = int.Parse(currMatch.Groups["distance"].Value);
-
-                    if (!validNames.Contains(name))
+                    if (Char.IsLetter(ch))
                     {
-                        input = Console.ReadLine();
-                        continue;
+                        currName.Append(ch);
                     }
-
-                    competitorsAndTheirDistance[name] += distance;
+                    else if (Char.IsDigit(ch))
+                    {
+                        distance += ch - 48;
+                    }
                 }
 
-                input = Console.ReadLine();
+                if (competitorsAndTheirDistance.ContainsKey(currName.ToString()))
+                {
+                    competitorsAndTheirDistance[currName.ToString()] += distance;
+                }
             }
 
-            var result = competitorsAndTheirDistance.OrderByDescending(x => x.Value).Take(3);
-
             int count = 1;
-
-            foreach (var item in result)
+            foreach (var item in competitorsAndTheirDistance.OrderByDescending(x => x.Value))
             {
                 string place = count == 1 ? "st" : count == 2 ? "nd" : "rd";
                 Console.WriteLine($"{count}{place} place: {item.Key}");
+
                 count++;
+
+                if (count == 4)
+                {
+                    break;
+                }
             }
         }
     }
